@@ -20,6 +20,7 @@
 		color: $$Props['color'] = 'gray',
 		items: $$Props['items'] = [],
 		value: $$Props['value'] = [],
+		singleSelection: $$Props['singleSelection'] = false,
 		label: $$Props['label'] = null,
 		size: $$Props['size'] = 'md',
 		radius: $$Props['radius'] = 'sm',
@@ -30,11 +31,23 @@
 
 	const dispatch = createEventDispatcher();
 
-	function onChanged(item, el) {
-		if (el.checked) value = [...value, item];
+function onChanged(item, target) {
+	let value = [];
+	// Single selection logic
+	if (singleSelection) {
+		if (target.checked) value = [item];
+		else value = [];
+		dispatch('change', value);
+	} 
+	
+	// Multiple selection logic
+	else {
+		if (target.checked) value = [...value, item];
 		else value = value.filter((val) => val !== item);
 		dispatch('change', value);
 	}
+}	
+
 </script>
 
 <!--
@@ -53,7 +66,7 @@ the items passed.
 -->
 
 <InputWrapper bind:element class={className} {label} {override} {size} {...$$restProps}>
-	<Group {direction} {spacing} {align}>
+	<Group {singleSelection} {direction} {spacing} {align}>
 		{#each items as item}
 			<Checkbox
 				{use}
